@@ -6,6 +6,31 @@ import (
 	"github.com/HamelBarrer/calls-server/internal/storage"
 )
 
+func init() {
+	if len(os.Args) > 1 {
+		p, err := storage.NewPostgres()
+		if err != nil {
+			panic(err)
+		}
+
+		drop := os.Args[1]
+		if drop != "true" {
+			panic("Arguments incorrect")
+		}
+
+		fileDrop := "querys/drops.sql"
+		openDrop, err := openFiles(fileDrop)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = p.Exec(openDrop)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func ExecQuery() {
 	p, err := storage.NewPostgres()
 	if err != nil {
@@ -33,6 +58,7 @@ func ExecQuery() {
 	if err != nil {
 		panic(err)
 	}
+
 }
 
 func openFiles(file string) (string, error) {
