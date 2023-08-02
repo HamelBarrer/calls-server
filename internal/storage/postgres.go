@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
 )
@@ -41,4 +42,8 @@ func (p *Postgres) Query(query string, args ...interface{}) (pgx.Rows, error) {
 
 func (p *Postgres) QueryRow(query string, args ...interface{}) pgx.Row {
 	return p.db.QueryRow(context.Background(), query, args...)
+}
+
+func (p *Postgres) Exec(query string, args ...interface{}) (pgconn.CommandTag, error) {
+	return p.db.Exec(context.Background(), query, args...)
 }
