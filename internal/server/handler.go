@@ -1,6 +1,7 @@
 package server
 
 import (
+	customauth "github.com/HamelBarrer/calls-server/internal/core/auths/custom_auth"
 	followeduser "github.com/HamelBarrer/calls-server/internal/core/users/followed_user"
 	"github.com/HamelBarrer/calls-server/internal/core/users/user"
 	"github.com/HamelBarrer/calls-server/internal/storage"
@@ -13,6 +14,10 @@ func Handler(s storage.Storage) {
 	ur := user.Newrepository(s)
 	uc := user.NewRouter(e)
 	uc.SetupConfig(ur)
+
+	cr := customauth.NewService(s)
+	cc := customauth.NewRouter(e)
+	cc.SetupConfig(cr)
 
 	fs := followeduser.NewService(s)
 	fc := followeduser.NewRouter(e)
