@@ -6,10 +6,15 @@ import (
 	"github.com/HamelBarrer/calls-server/internal/core/users/user"
 	"github.com/HamelBarrer/calls-server/internal/storage"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func Handler(s storage.Storage) {
 	e := echo.New()
+
+	e.Use(middleware.CORS())
+	e.Use(middleware.Recover())
+	e.Use(middleware.Logger())
 
 	ur := user.Newrepository(s)
 	uc := user.NewRouter(e)

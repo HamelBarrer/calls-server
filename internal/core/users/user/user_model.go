@@ -1,8 +1,13 @@
 package user
 
+import (
+	"github.com/jackc/pgx/v5/pgtype/zeronull"
+)
+
 type User struct {
-	UserId   int    `json:"user_id,omitempty" required:"false"`
-	Username string `json:"username,omitempty" required:"true"`
+	UserId   int           `json:"user_id,omitempty" required:"false"`
+	Username string        `json:"username,omitempty" required:"true"`
+	Avatar   zeronull.Text `json:"avatar,omitempty" required:"false"`
 }
 
 type UserCreate struct {

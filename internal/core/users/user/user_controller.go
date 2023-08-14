@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -64,4 +65,30 @@ func (co *Controller) CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, nu)
+}
+
+func (co *Controller) UpdatedUser(c echo.Context) error {
+	ui, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	avatar, err := c.FormFile("avatar")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	location := fmt.Sprintf("files/images/%d/avatar", ui)
+	file := fmt.Sprintf("files/images/%d/avatar/%s", ui, avatar.Filename)
+
+	if err := utils.UploadFile(location, file, avatar); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	uu, err := co.r.Update(ui, file)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, uu)
 }

@@ -9,6 +9,7 @@ type Repository interface {
 	GetById(int) (*User, error)
 	GetAllUser() (*[]User, error)
 	Create(UserCreate) (*User, error)
+	Update(int, string) (*User, error)
 }
 
 type repository struct {
@@ -25,12 +26,13 @@ func (r *repository) GetById(ui int) (*User, error) {
 	query := `
 		select
 			u.user_id,
-			u.username
+			u.username,
+			u.avatar
 		from users.users u
 		where u.user_id = $1;
 	`
 
-	if err := r.s.QueryRow(query, ui).Scan(&u.UserId, &u.Username); err != nil {
+	if err := r.s.QueryRow(query, ui).Scan(&u.UserId, &u.Username, &u.Avatar); err != nil {
 		return nil, err
 	}
 
@@ -43,7 +45,8 @@ func (r *repository) GetAllUser() (*[]User, error) {
 	query := `
 		select
 			u.user_id,
-			u.username
+			u.username,
+			u.avatar
 		from users.users u;
 	`
 
@@ -55,7 +58,7 @@ func (r *repository) GetAllUser() (*[]User, error) {
 	for rows.Next() {
 		u := User{}
 
-		if err := rows.Scan(&u.UserId, &u.Username); err != nil {
+		if err := rows.Scan(&u.UserId, &u.Username, &u.Avatar); err != nil {
 			return nil, err
 		}
 
@@ -84,4 +87,22 @@ func (r *repository) Create(uc UserCreate) (*User, error) {
 	}
 
 	return r.GetById(registerId)
+}
+
+func (r *repository) Update(ui int, a string) (*User, error) {
+	query := `
+		update users.users
+		set avatar = $1
+		where user_id = $2
+		returning user_id;
+	`
+
+	updatedId := 0
+
+	err := r.s.QueryRow(query, a, ui).Scan(&updatedId)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.GetById(updatedId)
 }

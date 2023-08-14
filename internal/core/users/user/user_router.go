@@ -23,4 +23,5 @@ func (ro *Router) SetupConfig(r Repository) {
 	ro.e.GET("/api/v1/users/:user_id", c.GetUser)
 	ro.e.GET("/api/v1/users", c.GetUsers, middlewares.ValidAuth)
 	ro.e.POST("/api/v1/users", c.CreateUser)
+	ro.e.PUT("/api/v1/users/:user_id", c.UpdatedUser)
 }
