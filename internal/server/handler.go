@@ -16,6 +16,8 @@ func Handler(s storage.Storage) {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 
+	e.Static("/files", "files")
+
 	ur := user.Newrepository(s)
 	uc := user.NewRouter(e)
 	uc.SetupConfig(ur)

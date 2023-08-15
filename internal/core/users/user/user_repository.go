@@ -92,7 +92,8 @@ func (r *repository) Create(uc UserCreate) (*User, error) {
 func (r *repository) Update(ui int, a string) (*User, error) {
 	query := `
 		update users.users
-		set avatar = $1
+		set avatar = $1,
+			updated_at = now()
 		where user_id = $2
 		returning user_id;
 	`

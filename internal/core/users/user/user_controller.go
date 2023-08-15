@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -73,19 +72,12 @@ func (co *Controller) UpdatedUser(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
 
-	avatar, err := c.FormFile("avatar")
+	ubicationFile, err := utils.UploadFile("avatar", ui, c)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
 
-	location := fmt.Sprintf("files/images/%d/avatar", ui)
-	file := fmt.Sprintf("files/images/%d/avatar/%s", ui, avatar.Filename)
-
-	if err := utils.UploadFile(location, file, avatar); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
-	}
-
-	uu, err := co.r.Update(ui, file)
+	uu, err := co.r.Update(ui, ubicationFile)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
