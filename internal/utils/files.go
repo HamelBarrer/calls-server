@@ -14,8 +14,8 @@ func UploadFile(nameForm string, id int, c echo.Context) (string, error) {
 		return "", err
 	}
 
-	location := fmt.Sprintf("files/images/%d/avatar", id)
-	fileUbication := fmt.Sprintf("files/images/%d/avatar/%s", id, file.Filename)
+	location := fmt.Sprintf("static/files/images/%d/avatar", id)
+	fileUbication := fmt.Sprintf("static/images/%d/avatar/%s", id, file.Filename)
 
 	src, err := file.Open()
 	if err != nil {
