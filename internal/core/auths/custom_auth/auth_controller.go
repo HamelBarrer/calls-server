@@ -48,6 +48,7 @@ func (co *Controller) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, echo.Map{
 		"user_id":  u.UserId,
 		"username": u.Username,
+		"avatar":   u.Avatar,
 		"token":    t,
 	})
 }

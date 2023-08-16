@@ -21,12 +21,13 @@ func (s *Service) GetUserByUsername(u string) (*AuthUser, error) {
 		select
 			u.user_id,
 			u.username,
-			u.password
+			u.password,
+			u.avatar
 		from users.users u
 		where u.username = $1;
 	`
 
-	if err := s.s.QueryRow(query, u).Scan(&a.UserId, &a.Username, &a.Password); err != nil {
+	if err := s.s.QueryRow(query, u).Scan(&a.UserId, &a.Username, &a.Password, &a.Avatar); err != nil {
 		return nil, err
 	}
 
