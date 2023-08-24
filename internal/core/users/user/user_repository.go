@@ -7,7 +7,7 @@ import (
 
 type Repository interface {
 	GetById(int) (*User, error)
-	GetAllUser() (*[]User, error)
+	GetAllUser(int) (*[]User, error)
 	Create(UserCreate) (*User, error)
 	Update(int, string) (*User, error)
 }
@@ -39,7 +39,7 @@ func (r *repository) GetById(ui int) (*User, error) {
 	return &u, nil
 }
 
-func (r *repository) GetAllUser() (*[]User, error) {
+func (r *repository) GetAllUser(currentUser int) (*[]User, error) {
 	us := []User{}
 
 	query := `
@@ -47,10 +47,11 @@ func (r *repository) GetAllUser() (*[]User, error) {
 			u.user_id,
 			u.username,
 			u.avatar
-		from users.users u;
+		from users.users u
+		where u.user_id <> $1;
 	`
 
-	rows, err := r.s.Query(query)
+	rows, err := r.s.Query(query, currentUser)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +76,14 @@ func (r *repository) Create(uc UserCreate) (*User, error) {
 	}
 
 	query := `
-		insert into users.users (username, password)
-		values ($1, $2)
+		insert into users.users (username, password, avatar)
+		values ($1, $2, $3)
 		returning user_id;
 	`
 
 	registerId := 0
 
-	if err := r.s.QueryRow(query, uc.Username, p).Scan(&registerId); err != nil {
+	if err := r.s.QueryRow(query, uc.Username, p, uc.Avatar).Scan(&registerId); err != nil {
 		return nil, err
 	}
 

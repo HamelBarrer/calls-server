@@ -31,7 +31,12 @@ func (co *Controller) GetUser(c echo.Context) error {
 }
 
 func (co *Controller) GetUsers(c echo.Context) error {
-	us, err := co.r.GetAllUser()
+	userId, err := strconv.Atoi(c.Get("userId").(string))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	us, err := co.r.GetAllUser(userId)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
@@ -44,26 +49,36 @@ func (co *Controller) GetUsers(c echo.Context) error {
 }
 
 func (co *Controller) CreateUser(c echo.Context) error {
-	u := new(UserCreate)
-	if err := c.Bind(u); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
-	}
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+	passwordConfirm := c.FormValue("passwordConfirm")
 
-	m, e := utils.ValidEmpty[UserCreate](*u)
-	if e {
-		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: m})
+	u := UserCreate{
+		User:            User{Username: username},
+		Password:        password,
+		PasswordConfirm: passwordConfirm,
 	}
 
 	if u.Password != u.PasswordConfirm {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: "The password not equals"})
 	}
 
-	nu, err := co.r.Create(*u)
+	nu, err := co.r.Create(u)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
 
-	return c.JSON(http.StatusCreated, nu)
+	ubicationFile, err := utils.UploadFile("avatar", nu.UserId, c)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	uu, err := co.r.Update(nu.UserId, ubicationFile)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusCreated, uu)
 }
 
 func (co *Controller) UpdatedUser(c echo.Context) error {

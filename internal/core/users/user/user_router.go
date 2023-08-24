@@ -20,8 +20,8 @@ func NewRouter(e *echo.Echo) Routers {
 func (ro *Router) SetupConfig(r Repository) {
 	c := NewController(r)
 
-	ro.e.GET("/api/v1/users/:user_id", c.GetUser)
+	ro.e.GET("/api/v1/users/:user_id", c.GetUser, middlewares.ValidAuth)
 	ro.e.GET("/api/v1/users", c.GetUsers, middlewares.ValidAuth)
 	ro.e.POST("/api/v1/users", c.CreateUser)
-	ro.e.PUT("/api/v1/users/:user_id", c.UpdatedUser)
+	ro.e.PUT("/api/v1/users/:user_id", c.UpdatedUser, middlewares.ValidAuth)
 }

@@ -18,3 +18,10 @@ create table if not exists users.followed_users (
 	constraint valid_followed_user check (user_id <> follower_user_id),
 	constraint valid_unique unique (user_id, follower_user_id)
 );
+
+create table if not exists users.commentaries (
+	commentary_id bigserial primary key,
+	user_id int not null references users.users on update cascade on delete cascade,
+	commentary varchar not null,
+	created_at timestamp default now()
+);
