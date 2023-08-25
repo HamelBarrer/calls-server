@@ -49,10 +49,17 @@ func (co *Controller) GetCommentaries(c echo.Context) error {
 }
 
 func (co *Controller) CreateCommentary(c echo.Context) error {
+	userId, err := strconv.Atoi(c.Get("userId").(string))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
+	}
+
 	com := new(Commentary)
 	if err := c.Bind(com); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, utils.ErrorHttp{Message: err.Error()})
 	}
+
+	com.UserId = userId
 
 	m, isEmpty := utils.ValidEmpty[Commentary](*com)
 	if isEmpty {
